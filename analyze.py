@@ -30,7 +30,6 @@ class Captcha(object):
     def analyze(self):
         #勾配を修正
         self.gradFixedImage, vector = self.fixGrad(self.image);
-        print vector
         #TODO: 文字の切り出し
         self.croppedImage = self.detectBox(self.gradFixedImage, vector);
         #ニューラルネットワーク！
@@ -67,7 +66,7 @@ class Captcha(object):
             ptInt = [(int(pt[0]), int(pt[1])) for pt in pts]
             draw.line(ptInt, fill="#ff0000", width=3);
             del draw;
-        return processed, [tuple(pt[0:2]) for pt in pts];
+        return processed, [tuple(int(v) for v in pt[0:2]) for pt in pts];
     POWER = math.exp(8);
     def calcForce(self, pt, other, isSigmoid=False):
         deltaX = other[0]-pt[0];
@@ -133,13 +132,80 @@ class Captcha(object):
         return pts;
     def detectBox(self, image, vector):
         w,h = image.size;
-    def updateBox(self, image, a, b):
-        pass
-    def view(self, label):
-        tkImg = ImageTk.PhotoImage(self.gradFixedImage);
-        label.configure(image = tkImg);
-        label.image = tkImg;
-        label.pack();
+        minSize = w / 4;
+        va, vb = vector;
+        width = vb[0]-va[0]
+        vec = None;
+        if width < minSize:
+            fix = (minSize - width) / 2;
+            vec = [va[0]-fix, va[1], vb[0]+fix, va[1]];
+        else:
+            vec = [va[0], va[1], vb[0], vb[1]];
+        extended = 1;
+        while extended > 0:
+            extended = 0;
+            extended += self.updateBox(image, vec, ( 0,  0,  0,  1));
+            extended += self.updateBox(image, vec, (-1,  0,  0,  0));
+            extended += self.updateBox(image, vec, ( 0, -1,  0,  0));
+            extended += self.updateBox(image, vec, ( 0,  0,  1,  0));
+        if self.debug:
+            draw = ImageDraw.Draw(image);
+            draw.rectangle(vec, outline="#ff0000");
+            del draw;
+    MARGIN = 10;
+    def updateBox(self, image, vec, fixVec):
+        outBound = False;
+        contCnt = 0;
+        extended = 0;
+        w,h = image.size;
+        while contCnt < Captcha.MARGIN:
+            if vec[0]+fixVec[0] < 0 or vec[1]+fixVec[1] < 0 or vec[2]+fixVec[2] >= w or vec[3]+fixVec[3] >=h:
+                outBound = True;
+                break;
+            if self.updateBoxStage(image, vec, fixVec) == 0:
+                contCnt+=1;
+            else:
+                contCnt = 0;
+            extended+=1;
+        if outBound:
+            return 0;
+        else:
+            for i in range(0, len(vec)):
+                vec[i] -= (fixVec[i] * Captcha.MARGIN);
+            extended -= Captcha.MARGIN;
+            return extended;
+    def updateBoxStage(self, image, vec, fixVec):
+        for i in xrange(0, len(vec)):
+            delta = fixVec[i];
+            vec[i] += delta;
+            pos = vec[i];
+            changed1 = (i+1) % 2;
+            changed2 = changed1+2 % 4;
+            _from = min(vec[changed1], vec[changed2]);
+            _to = max(vec[changed1], vec[changed2]);
+            isX = (i % 2) == 0;
+            blackCount = 0;
+            if delta != 0:
+                for j in xrange(_from, _to+1):
+                    if isX:
+                        pix = image.getpixel((pos, j));
+                    else:
+                        pix = image.getpixel((j, pos));
+                    r,g,b, = pix;
+                    pix = 1-((r+g+b) / 3.0 / 255.0);
+                    if pix > 0.1:
+                        blackCount+=1;
+                return blackCount;
+        return None;
+    def view(self, origLabel, gradFixedLabel):
+        tkImage = ImageTk.PhotoImage(self.image);
+        origLabel.configure(image = tkImage);
+        origLabel.image = tkImage;
+        origLabel.pack();
+        tkGradFixedImage = ImageTk.PhotoImage(self.gradFixedImage);
+        gradFixedLabel.configure(image = tkGradFixedImage);
+        gradFixedLabel.image = tkGradFixedImage;
+        gradFixedLabel.pack();
 
 def onNext(isFirst):
     fname = os.path.abspath(files[0]);
@@ -148,7 +214,7 @@ def onNext(isFirst):
         fname = os.path.abspath(files[0]);
     cap = Captcha(fname, True);
     cap.analyze();
-    cap.view(label);
+    cap.view(origLabel, gradFixedLabel);
 
 def next(event):
     onNext(False);
@@ -157,6 +223,7 @@ if __name__ == '__main__':
     files = glob.glob("./image/*.jpg");
     window = Tk();
     window.bind_all("<Return>", next);
-    label = Label(window);
+    origLabel = Label(window);
+    gradFixedLabel = Label(window);
     onNext(True);
     window.mainloop();
