@@ -26,6 +26,7 @@ class Captcha(object):
     def __init__(self, fname, debug = False):
         self.fname = fname;
         self.image = Image.open(fname);
+        self.whiteImage= Image.new("RGBA", self.image.size, (255,255,255,255))
         self.debug = debug;
     def analyze(self):
         #勾配を修正
@@ -41,6 +42,7 @@ class Captcha(object):
         processed = image \
             .filter(ImageFilter.MaxFilter) \
             .filter(ImageFilter.MinFilter) \
+            .convert("RGBA") \
             ;
         pts = self.gravity(processed);
         pts.sort();
@@ -51,6 +53,7 @@ class Captcha(object):
             rot += math.atan2(deltaY, deltaX);
         rot /= len(pts)-1;
         processed = processed.rotate(math.degrees(rot), Image.BICUBIC)
+        processed = Image.composite(processed, self.whiteImage, processed)
         #ポイントもそれにつれて回転
         w,h = processed.size;
         w/=2.0;
@@ -106,7 +109,7 @@ class Captcha(object):
         w,h = image.size;
         for y in range(0, h):
             for x in range(0, w):
-                r,g,b = image.getpixel((x,y))
+                r,g,b,a = image.getpixel((x,y))
                 weight = (255*3-(r+g+b)) / (3.0 * 255);
                 if weight > 0.1:
                     stones.append((x,y,1.0));
@@ -158,22 +161,25 @@ class Captcha(object):
         contCnt = 0;
         extended = 0;
         w,h = image.size;
+        total=0;
         while contCnt < Captcha.MARGIN:
             if vec[0]+fixVec[0] < 0 or vec[1]+fixVec[1] < 0 or vec[2]+fixVec[2] >= w or vec[3]+fixVec[3] >=h:
                 outBound = True;
                 break;
-            if self.updateBoxStage(image, vec, fixVec) == 0:
+            total += 1;
+            if self.updateBoxStage(image, vec, fixVec) <= 0:
                 contCnt+=1;
             else:
                 contCnt = 0;
             extended+=1;
         if outBound:
-            return 0;
+            over = contCnt;
         else:
-            for i in range(0, len(vec)):
-                vec[i] -= (fixVec[i] * Captcha.MARGIN);
-            extended -= Captcha.MARGIN;
-            return extended;
+            over = Captcha.MARGIN;
+        for i in range(0, len(vec)):
+            vec[i] -= (fixVec[i] * over);
+        extended -= over;
+        return extended;
     def updateBoxStage(self, image, vec, fixVec):
         for i in xrange(0, len(vec)):
             delta = fixVec[i];
@@ -191,7 +197,7 @@ class Captcha(object):
                         pix = image.getpixel((pos, j));
                     else:
                         pix = image.getpixel((j, pos));
-                    r,g,b, = pix;
+                    r,g,b,a = pix;
                     pix = 1-((r+g+b) / 3.0 / 255.0);
                     if pix > 0.1:
                         blackCount+=1;
