@@ -30,7 +30,6 @@ class CharDetect(object):
         if len(self.emptyLines) >= CharDetect.CHARACTERS-1:
             emptyLines = self.emptyLines[:];
             emptyLines.sort(lambda x,y : -cmp(x[1],y[1]));
-            print emptyLines;
             self.divLines = emptyLines[0:CharDetect.CHARACTERS-1];
         else:
             self.divLines = self.detectChar(self.emptyLines, CharDetect.CHARACTERS-1-len(self.emptyLines), self.statics);

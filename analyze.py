@@ -17,7 +17,7 @@ import os;
 import random;
 import math;
 
-from Tkinter import Tk, Label, Frame;
+from Tkinter import Tk, Label, Frame, Entry;
 from PIL import Image, ImageTk, ImageFilter, ImageDraw;
 
 from analyzer.gravity import Gravity;
@@ -58,8 +58,12 @@ class Captcha(object):
         divLabelFrame.pack();
 
 def onNext(isFirst):
+    ans = textLabel.get();
+    textLabel.delete(0, len(ans));
     fname = os.path.abspath(files[0]);
     if(not isFirst):
+        if len(ans) != 5:
+            return;
         del files[0];
         fname = os.path.abspath(files[0]);
     cap = Captcha(fname);
@@ -72,12 +76,14 @@ def next(event):
 if __name__ == '__main__':
     files = glob.glob("./image/*.jpg");
     window = Tk();
-    window.bind_all("<Return>", next);
     origLabel = Label(window);
     gradFixedLabel = Label(window);
     croppedLabel = Label(window);
     charLabel =Label(window);
     divLabelFrame = Frame(window);
     divLabels = [Label(divLabelFrame) for i in range(0,5)];
+    textLabel = Entry(window);
     onNext(True);
+    textLabel.pack();
+    textLabel.bind("<Return>", next);
     window.mainloop();
