@@ -33,6 +33,7 @@ class Captcha(object):
         self.gradFixedImage, vector = self.fixGrad(self.image);
         #TODO: 文字の切り出し
         self.croppedImage = self.detectBox(self.gradFixedImage, vector);
+        self.detectChar(self.croppedImage);
         #ニューラルネットワーク！
 
     """
@@ -151,10 +152,12 @@ class Captcha(object):
             extended += self.updateBox(image, vec, (-1,  0,  0,  0));
             extended += self.updateBox(image, vec, ( 0, -1,  0,  0));
             extended += self.updateBox(image, vec, ( 0,  0,  1,  0));
+        cropImage = image.copy().crop(vec);
         if self.debug:
             draw = ImageDraw.Draw(image);
             draw.rectangle(vec, outline="#ff0000");
             del draw;
+        return cropImage;
     MARGIN = 10;
     def updateBox(self, image, vec, fixVec):
         outBound = False;
@@ -203,7 +206,99 @@ class Captcha(object):
                         blackCount+=1;
                 return blackCount;
         return None;
-    def view(self, origLabel, gradFixedLabel):
+    def detectCharByEmptyLine(self, image):
+        w,h = image.size;
+        lastBlack = None;
+        lineInfo = [(0,0)];
+        cList = [];
+        contCnt = 0;
+        for x in xrange(1,w):
+            black = 0;
+            delta = 0;
+            for y in xrange(0,h):
+                r,g,b,a = image.getpixel((x,y));
+                pix = 1-((r+g+b) / 3.0 / 255.0);
+                r,g,b,a = image.getpixel((x-1,y));
+                pixLast = 1-((r+g+b) / 3.0 / 255.0);
+                if pix > 0.1:
+                    black+=1;
+                if pix > 0.1 and pixLast <= 0.1 or pix <= 0.1 and pixLast > 0.1:
+                    delta+=1;
+            lineInfo.append((black, delta));
+            if lastBlack == black:
+                contCnt += 1;
+            elif lastBlack != None:
+                if lastBlack == 0:
+                    cList.append((contCnt, x-contCnt-1));
+                contCnt = 0;
+            lastBlack = black;
+        draw = ImageDraw.Draw(image);
+        for line in cList:
+            x = line[1] + line[0]/2;
+            draw.line([(x, 0),(x, h)], fill="#00ffff", width=1);
+        del draw;
+        return lineInfo, cList;
+    CHARACTERS = 5;
+    def detectChar(self, image):
+        w,h = image.size;
+        lineInfo, emptyLines = self.detectCharByEmptyLine(image);
+        if len(emptyLines) >= Captcha.CHARACTERS-1:
+            return emptyLines[:Captcha.CHARACTERS-1];
+        left = Captcha.CHARACTERS-1-len(emptyLines);
+        # 空白で区切れない場合、どうしようか？
+        block = w/5;
+        splitList = [];
+        infoLst = [];
+        blackLst = [];
+        for x in xrange(max(w/10,5),min(w*9/10, w-5)):
+            changedP = float(lineInfo[x-1][1]+lineInfo[x][1]+lineInfo[x+1][1])/h/3;
+            sameP = 1-changedP;
+            assert changedP <= 1.0 and changedP >= 0.0
+            if changedP > 0.95 or changedP < 0.05:
+                infoSize = 0;
+            else:
+                infoSize = -(changedP * math.log(changedP, 2) + sameP * math.log(sameP, 2))
+            infoLst.append((x, h-int(infoSize*h)));
+            blackLst.append((x, h-lineInfo[x][0]));
+            addFlag = True
+            for emp in emptyLines:
+                center = emp[1]+emp[0]/2;
+                if abs(x-center) < block:
+                    addFlag = False;
+                    break;
+            if addFlag:
+                splitList.append((infoSize * lineInfo[x][1], lineInfo[x][0], x));
+        splitList.sort();
+        splitLines = []
+        print splitList
+        for i in xrange(0, left):
+            maxInfo = splitList[len(splitList)-1][0];
+            print maxInfo;
+            maxList = [];
+            for item in splitList:
+                info, black, x = item;
+#                if abs(maxInfo-info) < 0.15:
+                maxList.append((black, x));
+            maxList.sort();
+            maxItem = maxList[0]
+            splitLines.append(maxItem);
+            print "line:", maxItem
+            #近隣を削除
+            newList = []
+            for item in splitList:
+                if abs(item[2]-maxItem[1]) >= block*3/4:
+                    newList.append(item);
+            splitList = newList;
+        #デバッグ用
+        draw = ImageDraw.Draw(image);
+        for line in splitLines:
+            x = line[1];
+            draw.line([(x, 0),(x, h)], fill="#ff00ff", width=1);
+        draw.line(infoLst, fill="#FF8B4D", width=1);
+        draw.line(blackLst, fill="#00ff00", width=1);
+        del draw;
+        self.croppedImage = self.croppedImage.resize((w*3,h*3))
+    def view(self, origLabel, gradFixedLabel, croppedLabel):
         tkImage = ImageTk.PhotoImage(self.image);
         origLabel.configure(image = tkImage);
         origLabel.image = tkImage;
@@ -212,15 +307,19 @@ class Captcha(object):
         gradFixedLabel.configure(image = tkGradFixedImage);
         gradFixedLabel.image = tkGradFixedImage;
         gradFixedLabel.pack();
+        tkCroppedImage = ImageTk.PhotoImage(self.croppedImage);
+        croppedLabel.configure(image = tkCroppedImage);
+        croppedLabel.image = tkCroppedImage;
+        croppedLabel.pack();
 
 def onNext(isFirst):
     fname = os.path.abspath(files[0]);
     if(not isFirst):
         del files[0];
         fname = os.path.abspath(files[0]);
-    cap = Captcha(fname, True);
+    cap = Captcha(fname, False);
     cap.analyze();
-    cap.view(origLabel, gradFixedLabel);
+    cap.view(origLabel, gradFixedLabel, croppedLabel);
 
 def next(event):
     onNext(False);
@@ -231,5 +330,6 @@ if __name__ == '__main__':
     window.bind_all("<Return>", next);
     origLabel = Label(window);
     gradFixedLabel = Label(window);
+    croppedLabel = Label(window);
     onNext(True);
     window.mainloop();
