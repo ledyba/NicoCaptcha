@@ -17,7 +17,7 @@ import os;
 import random;
 import math;
 
-from Tkinter import Tk, Label;
+from Tkinter import Tk, Label, Frame;
 from PIL import Image, ImageTk, ImageFilter, ImageDraw;
 
 from analyzer.gravity import Gravity;
@@ -44,20 +44,23 @@ class Captcha(object):
         #TODO: 文字の切り出し
         self.char = CharDetect(self.box.getImage(), Neural.SIZE);
         self.char.analyze();
-
         #ニューラルネットワーク！
 
     def setImage(self, label, image):
         tkImage = ImageTk.PhotoImage(image);
         label.configure(image = tkImage);
         label.image = tkImage;
-        label.pack();
+        return label;
 
-    def view(self, origLabel, gradFixedLabel, croppedLabel, charLabel):
-        self.setImage(origLabel, self.image);
-        self.setImage(gradFixedLabel, self.gravity.getDebugImage());
-        self.setImage(croppedLabel, self.box.getDebugImage());
-        self.setImage(charLabel, self.char.getDebugImage())
+    def view(self, origLabel, gradFixedLabel, croppedLabel, charLabel, divLabelFrame, divLabels):
+        self.setImage(origLabel, self.image).pack();
+        self.setImage(gradFixedLabel, self.gravity.getDebugImage()).pack();
+        self.setImage(croppedLabel, self.box.getDebugImage()).pack();
+        self.setImage(charLabel, self.char.getDebugImage()).pack();
+        for i in range(0, len(divLabels)):
+            label = divLabels[i];
+            self.setImage(label, self.char.getImage(i)).pack(side='left');
+        divLabelFrame.pack();
 
 def onNext(isFirst):
     fname = os.path.abspath(files[0]);
@@ -66,7 +69,7 @@ def onNext(isFirst):
         fname = os.path.abspath(files[0]);
     cap = Captcha(fname);
     cap.analyze();
-    cap.view(origLabel, gradFixedLabel, croppedLabel, charLabel);
+    cap.view(origLabel, gradFixedLabel, croppedLabel, charLabel, divLabelFrame, divLabels);
 
 def next(event):
     onNext(False);
@@ -79,5 +82,7 @@ if __name__ == '__main__':
     gradFixedLabel = Label(window);
     croppedLabel = Label(window);
     charLabel =Label(window);
+    divLabelFrame = Frame(window);
+    divLabels = [Label(divLabelFrame) for i in range(0,5)];
     onNext(True);
     window.mainloop();

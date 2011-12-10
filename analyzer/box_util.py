@@ -14,21 +14,24 @@
 MARGIN=20
 def updateBoxStage(image, vec, fixVec):
     for i in xrange(0, len(vec)):
-        delta = fixVec[i];
-        vec[i] += delta;
-        pos = vec[i];
-        changed1 = (i+1) % 2;
-        changed2 = changed1+2 % 4;
-        _from = min(vec[changed1], vec[changed2]);
-        _to = max(vec[changed1], vec[changed2]);
-        isX = (i % 2) == 0;
-        blackCount = 0;
-        if delta != 0:
+        if fixVec[i] != 0:
+            vec[i] += fixVec[i];
+            pos = vec[i];
+            changed1 = (i+1) % 2;
+            changed2 = changed1+2 % 4;
+            _from = min(vec[changed1], vec[changed2]);
+            _to = max(vec[changed1], vec[changed2]);
+            isX = (i % 2) == 0;
+            blackCount = 0;
             for j in xrange(_from, _to+1):
                 if isX:
                     pix = image.getpixel((pos, j));
                 else:
-                    pix = image.getpixel((j, pos));
+                    try:
+                        pix = image.getpixel((j, pos));
+                    except:
+                        print vec;
+                        print (j, pos),"<>",image.size;
                 r,g,b,a = pix;
                 pix = 1-((r+g+b) / 3.0 / 255.0);
                 if pix > 0.1:
@@ -53,6 +56,6 @@ def updateBox(image, vec, fixVec):
             contCnt = 0;
         extended+=1;
     for i in range(0, len(vec)):
-        vec[i] -= (fixVec[i] * contCnt);
+        vec[i] -= (fixVec[i] * (contCnt));
     extended -= contCnt;
     return extended;

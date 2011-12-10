@@ -37,6 +37,8 @@ class BoxDetect(object):
             extended += box_util.updateBox(self.__image, vec, ( 0, -1,  0,  0));
             extended += box_util.updateBox(self.__image, vec, ( 0,  0,  1,  0));
         self.debugImage = self.__image.copy();
+        vec[2]+=1;
+        vec[3]+=1;
         self.image = self.__image.crop(vec);
         draw = ImageDraw.Draw(self.debugImage);
         draw.rectangle(vec, outline="#ff0000");

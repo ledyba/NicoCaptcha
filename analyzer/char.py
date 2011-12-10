@@ -35,19 +35,20 @@ class CharDetect(object):
         else:
             self.divLines = self.detectChar(self.emptyLines, CharDetect.CHARACTERS-1-len(self.emptyLines), self.statics);
         self.debugImage = self.debugImage.resize((self.width*3, self.height*3));
-        self.divImage();
+        self.images = self.divImage();
     def extendImg(self, image):
         w,h = image.size;
-        print w,h
-        vec = [0, h/2-1, w-1, h/2+1]
+        vec = [0, h/2+1, w-1, h/2+1]
         box_util.updateBox(image, vec, ( 0,  0,  0,  1));
         box_util.updateBox(image, vec, ( 0, -1,  0,  0));
+        vec[2]+=1;
+        vec[3]+=1;
         image = image.crop(vec);
         w,h = image.size;
         max_ = max(w,h)
         extended = Image.new("RGBA", (max_, max_), (255,255,255,255))
         extended.paste(image, ((max_-w)/2, (max_-h)/2), image);
-        return extended.resize((self.resizedSize,self.resizedSize), Image.BILINEAR);
+        return extended.resize((self.resizedSize,self.resizedSize), Image.NEAREST);
 
     def divImage(self):
         nowX = 0
@@ -144,7 +145,6 @@ class CharDetect(object):
             maxList.sort();
             maxItem = maxList[0]
             splitLines.append(maxItem);
-            print "line:", maxItem
             #近隣を削除
             newList = []
             for item in splitList:
@@ -161,7 +161,8 @@ class CharDetect(object):
         for line in splitLines:
             emptyLines.append((line[1],0));
         return emptyLines;
-
+    def getImage(self, idx):
+        return self.images[idx];
     def getDivLine(self):
         return self.divLines;
     def getDebugImage(self):
