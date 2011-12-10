@@ -23,12 +23,7 @@ from PIL import Image, ImageTk, ImageFilter, ImageDraw;
 from analyzer.gravity import Gravity;
 from analyzer.box import BoxDetect;
 from analyzer.char import CharDetect;
-
-class Neural(object):
-    SIZE=32
-    pass
-
-
+from analyzer.neural import Neural;
 
 class Captcha(object):
     def __init__(self, fname):
