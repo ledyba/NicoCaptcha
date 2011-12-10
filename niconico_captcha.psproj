@@ -4,24 +4,80 @@ Version=2.4.1.0
 [Project]
 ClassName=TProjectRootNode
 StoreRelativePaths=FALSE
-ShowFileExtensions=FALSE
+ShowFileExtensions=TRUE
 
 [Project\ChildNodes\Node0]
 ClassName=TProjectFilesNode
 
 [Project\ChildNodes\Node0\ChildNodes\Node0]
+ClassName=TProjectFolderNode
+Name=analyzer
+
+[Project\ChildNodes\Node0\ChildNodes\Node0\ChildNodes\Node0]
+ClassName=TProjectFileNode
+FileName=D:\Dropbox\src\niconico_captcha\analyzer\bayese.py
+
+[Project\ChildNodes\Node0\ChildNodes\Node0\ChildNodes\Node1]
+ClassName=TProjectFileNode
+FileName=D:\Dropbox\src\niconico_captcha\analyzer\box.py
+
+[Project\ChildNodes\Node0\ChildNodes\Node0\ChildNodes\Node2]
+ClassName=TProjectFileNode
+FileName=D:\Dropbox\src\niconico_captcha\analyzer\box_util.py
+
+[Project\ChildNodes\Node0\ChildNodes\Node0\ChildNodes\Node3]
+ClassName=TProjectFileNode
+FileName=D:\Dropbox\src\niconico_captcha\analyzer\char.py
+
+[Project\ChildNodes\Node0\ChildNodes\Node0\ChildNodes\Node4]
+ClassName=TProjectFileNode
+FileName=D:\Dropbox\src\niconico_captcha\analyzer\gravity.py
+
+[Project\ChildNodes\Node0\ChildNodes\Node0\ChildNodes\Node5]
+ClassName=TProjectFileNode
+FileName=D:\Dropbox\src\niconico_captcha\analyzer\neural.py
+
+[Project\ChildNodes\Node0\ChildNodes\Node0\ChildNodes]
+Count=6
+
+[Project\ChildNodes\Node0\ChildNodes\Node1]
 ClassName=TProjectFileNode
 FileName=D:\Dropbox\src\niconico_captcha\analyze.py
 
-[Project\ChildNodes\Node0\ChildNodes\Node1]
+[Project\ChildNodes\Node0\ChildNodes\Node2]
 ClassName=TProjectFileNode
 FileName=D:\Dropbox\src\niconico_captcha\rename.py
 
 [Project\ChildNodes\Node0\ChildNodes]
-Count=2
+Count=3
 
 [Project\ChildNodes\Node1]
 ClassName=TProjectRunConfiguationsNode
+
+[Project\ChildNodes\Node1\ChildNodes\Node0]
+ClassName=TProjectRunConfiguationNode
+Name=Normal
+
+[Project\ChildNodes\Node1\ChildNodes\Node0\RunConfig]
+ScriptName=D:\Dropbox\src\niconico_captcha\analyze.py
+EngineType=peRemote
+ReinitializeBeforeRun=TRUE
+WorkingDir=$[ActiveScript-Dir]
+WriteOutputToFile=FALSE
+OutputFileName=$[ActiveScript-NoExt].log
+AppendToFile=FALSE
+
+[Project\ChildNodes\Node1\ChildNodes\Node0\RunConfig\ExternalRun]
+Caption=External Run
+Description=Run script using an external Python Interpreter
+ApplicationName=$[PythonExe-Short]
+Parameters=$[ActiveScript-Short]
+WorkingDirectory=$[ActiveScript-Dir]
+ShortCut=0
+MessagesFormat=$[FileName] $[LineNumber]
+
+[Project\ChildNodes\Node1\ChildNodes]
+Count=1
 
 [Project\ChildNodes]
 Count=2

@@ -24,9 +24,14 @@ from analyzer.gravity import Gravity;
 from analyzer.box import BoxDetect;
 from analyzer.char import CharDetect;
 from analyzer.neural import Neural;
+from analyzer.bayese import Bayese;
+
+class Trainer(object):
+    pass
 
 class Captcha(object):
-    def __init__(self, fname):
+    def __init__(self, trainer, fname):
+        self.trainer = trainer;
         self.fname = fname;
         self.image = Image.open(fname);
     def analyze(self):
@@ -39,14 +44,15 @@ class Captcha(object):
         #TODO: 文字の切り出し
         self.char = CharDetect(self.box.getImage(), Neural.SIZE);
         self.char.analyze();
-        #ニューラルネットワーク！
-
     def setImage(self, label, image):
         tkImage = ImageTk.PhotoImage(image);
         label.configure(image = tkImage);
         label.image = tkImage;
         return label;
-
+    def judge(self):
+        pass
+    def train(self, answer):
+        pass
     def view(self, origLabel, gradFixedLabel, croppedLabel, charLabel, divLabelFrame, divLabels):
         self.setImage(origLabel, self.image).pack();
         self.setImage(gradFixedLabel, self.gravity.getDebugImage()).pack();
@@ -66,7 +72,7 @@ def onNext(isFirst):
             return;
         del files[0];
         fname = os.path.abspath(files[0]);
-    cap = Captcha(fname);
+    cap = Captcha(trainer, fname);
     cap.analyze();
     cap.view(origLabel, gradFixedLabel, croppedLabel, charLabel, divLabelFrame, divLabels);
 
@@ -74,6 +80,7 @@ def next(event):
     onNext(False);
 
 if __name__ == '__main__':
+    trainer = Trainer();
     files = glob.glob("./image/*.jpg");
     window = Tk();
     origLabel = Label(window);

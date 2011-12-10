@@ -14,7 +14,7 @@
 import pickle;
 import sys;
 import os;
-class Bayes(object):
+class Bayese(object):
     def __init__(self, fname="bayese.dat", matrixSize=26):
         self.fname=fname;
         if os.path.exists(self.fname):
@@ -22,8 +22,8 @@ class Bayes(object):
                 self.matrix = pickle.load(f);
         else:
             self.matrix = {
-                size:matrixSize,
-                matrix: [0] * (self.matrixSize * self.matrixSize)
+                "size":matrixSize,
+                "matrix": [0] * (matrixSize * matrixSize)
             }
     def train(self, one, another, delta):
         self.matrix[one*self.matrixSize + another] += delta;
