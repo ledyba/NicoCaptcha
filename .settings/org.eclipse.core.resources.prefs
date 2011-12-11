@@ -1,0 +1,10 @@
+#Sun Dec 11 11:56:56 JST 2011
+eclipse.preferences.version=1
+encoding//src/analyze.py=utf-8
+encoding//src/analyzer/__init__.py=utf-8
+encoding//src/analyzer/bayese.py=utf-8
+encoding//src/analyzer/box.py=utf-8
+encoding//src/analyzer/box_util.py=utf-8
+encoding//src/analyzer/char.py=utf-8
+encoding//src/analyzer/gravity.py=utf-8
+encoding//src/analyzer/neural.py=utf-8

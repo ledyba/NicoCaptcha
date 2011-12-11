@@ -11,14 +11,11 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import sys;
 import glob;
 import os;
-import random;
-import math;
 
 from Tkinter import Tk, Label, Frame, Entry;
-from PIL import Image, ImageTk, ImageFilter, ImageDraw;
+from PIL import Image, ImageTk;
 
 from analyzer.gravity import Gravity;
 from analyzer.box import BoxDetect;
@@ -81,7 +78,7 @@ def next(event):
 
 if __name__ == '__main__':
     trainer = Trainer();
-    files = glob.glob("./image/*.jpg");
+    files = glob.glob("../image/*.jpg");
     window = Tk();
     origLabel = Label(window);
     gradFixedLabel = Label(window);
