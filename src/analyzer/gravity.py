@@ -4,11 +4,18 @@
 import math;
 from PIL import Image, ImageFilter, ImageDraw;
 
+def filter(i):
+	if i >= 255:
+		return 255;
+	else:
+		return 0;
+
 class Gravity(object):
 	def __init__(self, image):
 		self.image = image \
 					.filter(ImageFilter.MaxFilter) \
 					.filter(ImageFilter.MinFilter) \
+					.convert("L")\
 					.convert("RGBA") \
 					;
 		self.width, self.height = self.image.size;

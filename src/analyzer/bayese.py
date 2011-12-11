@@ -17,10 +17,10 @@ class Bayese(object):
 	@classmethod
 	def load(cls, fname="bayese.dat"):
 		if os.path.exists(fname):
-			with open(fname,"r") as f:
+			with open(fname,"rb") as f:
 				return pickle.load(f);
 		else:
 			return Bayese();
 	def save(self, fname="bayese.dat"):
-		with open(self.fname, "w") as f:
+		with open(self.fname, "wb") as f:
 			f.write(pickle.dump(self, f, -1));
