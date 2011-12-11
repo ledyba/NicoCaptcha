@@ -1,33 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
-# Name:        module1
-# Purpose:
-#
-# Author:      psi
-#
-# Created:     07/12/2011
-# Copyright:   (c) psi 2011
-# Licence:     <your licence>
-#-------------------------------------------------------------------------------
-import sys;
+
 import glob;
 import os;
-from Tkinter import *;
+from Tkinter import LEFT, Tk, Label, Entry;
 from PIL import Image, ImageTk;
 
 window = Tk();
 textLabel = Entry(window);
 imageLabel = Label(window);
-files = glob.glob("./image/*.jpg");
+files = glob.glob("../image/*.jpg");
 
 def rename(fname, rname):
-    dir = os.path.dirname(fname);
-    _name = os.path.join(dir, rname+".png");
+    _dir = os.path.dirname(fname);
+    _name = os.path.join(_dir, rname+".png");
     print fname, _name
     os.rename(fname, _name);
 
-def next(isFirst = False):
+def nextImage(isFirst = False):
     reName = textLabel.get();
     textLabel.delete(0, len(reName));
     fname = os.path.abspath(files[0]);
@@ -46,11 +36,11 @@ def next(isFirst = False):
     textLabel.pack(side=LEFT);
 
 def onEnter(event):
-    next(False);
+    nextImage(False);
 
 def main():
     textLabel.bind("<Return>", onEnter);
-    next(True);
+    nextImage(True);
     window.mainloop();
 
 if __name__ == '__main__':

@@ -1,15 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
-# Name:        module1
-# Purpose:
-#
-# Author:      psi
-#
-# Created:     07/12/2011
-# Copyright:   (c) psi 2011
-# Licence:     <your licence>
-#-------------------------------------------------------------------------------
 
 import glob;
 import os;
