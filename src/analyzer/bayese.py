@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pickle;
+import os;
 class Bayese(object):
 	def __init__(self, matrixSize=26):
 		self.matrixSize = matrixSize;
@@ -13,10 +14,13 @@ class Bayese(object):
 		for i in xrange(one*self.matrixSize, (one+1)*self.matrixSize-1):
 			total += self.matrix[i];
 		return float(self.matrix[one*self.matrixSize + another])/total;
-	@staticmethod
+	@classmethod
 	def load(cls, fname="bayese.dat"):
-		with open(fname) as f:
-			return pickle.load(f);
+		if os.path.exists(fname):
+			with open(fname,"r") as f:
+				return pickle.load(f);
+		else:
+			return Bayese();
 	def save(self, fname="bayese.dat"):
 		with open(self.fname, "w") as f:
 			f.write(pickle.dump(self, f, -1));
