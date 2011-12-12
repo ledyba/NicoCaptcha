@@ -17,7 +17,7 @@ def _main():
 		files = glob.glob("../renamed/*.png");
 		random.shuffle(files);
 		trainer = Trainer();
-		for _ in xrange(0, 1000):
+		for _ in xrange(0, 10000):
 			fname = random.choice(files)
 			absoluteName = os.path.abspath(fname);
 			ans = os.path.basename(absoluteName).split(".")[0].split("_")[0];

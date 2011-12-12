@@ -3,7 +3,7 @@
 
 import glob;
 import os;
-
+import random;
 from Tkinter import Tk, Label, Frame, Entry;
 from tkFont import Font;
 from captcha import Captcha, Trainer;
@@ -42,6 +42,7 @@ def _pack():
 	textLabel.pack();
 if __name__ == '__main__':
 	files = glob.glob("../image/*.jpg");
+	random.shuffle(files);
 	window = Tk();
 	origLabel = Label(window)
 	gradFixedLabel = Label(window)

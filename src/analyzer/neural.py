@@ -6,7 +6,7 @@ import math;
 import os;
 import random;
 
-TRAIN_RATIO = 0.3;
+TRAIN_RATIO = 0.1;
 RANGE=1.0
 
 class Neuron(object):
