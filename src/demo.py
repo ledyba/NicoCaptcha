@@ -16,10 +16,13 @@ def onNext(isFirst):
 	textLabel.delete(0, len(ans));
 	fname = os.path.abspath(files[0]);
 	if(not isFirst):
-		if len(ans) != 5:
-			return;
-		cap.train(ans);
-		trainer.save();
+		if ans and len(ans) == 5:
+			cap.train(ans);
+			trainer.save();
+		elif len(ans) == 0:
+			pass
+		else:
+			return
 		del files[0];
 		fname = os.path.abspath(files[0]);
 	cap = Captcha(trainer, fname);
@@ -52,7 +55,7 @@ if __name__ == '__main__':
 	divLabels = [Label(divLabelFrame) for i in range(0,5)];
 	ansLabel = Label(window, font=Font(size=36,weight="bold"), fg="#ff0000")
 	ansTxtLabel = Label(window, text=u"答えはこれであってる？")
-	textLabel = Entry(window);
+	textLabel = Entry(window, font=Font(size=36,weight="bold"), width=9);
 	_pack();
 	onNext(True);
 	textLabel.bind("<Return>", nextImage);
