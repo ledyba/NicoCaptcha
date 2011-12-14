@@ -64,14 +64,17 @@ class Captcha(object):
 		self.char.analyze();
 
 		answer = [];
+		succeeded = 0;
 		for i in xrange(0, CharDetect.CHARACTERS):
 			out = self.trainer.judge(self.char.getImage(i));
 			if ans != None:
 				if ans[i] != out:
 					self.trainer.train(i, ans[i]);
+				else:
+					succeeded+=1;
 			answer.append(out);
 		self.answer = "".join(answer);
-		return self.answer
+		return self.answer + ("  %d%%" % (int(100*succeeded)/CharDetect.CHARACTERS))
 	def train(self, trueAnswer):
 		for i in range(0, len(trueAnswer)):
 			ans = self.trainer.judge(self.char.getImage(i));
