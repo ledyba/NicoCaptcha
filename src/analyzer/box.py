@@ -34,7 +34,6 @@ class BoxDetect(object):
 		draw = ImageDraw.Draw(self.debugImage);
 		draw.rectangle(vec, outline="#ff0000");
 		del draw;
-
 	def getImage(self):
 		return self.image;
 	def getDebugImage(self):

@@ -12,10 +12,12 @@ def filter(i):
 
 class Gravity(object):
 	def __init__(self, image):
+		self.origImage = image;
+		self.rotatedImage = None;
 		self.image = image \
+					.convert("L")\
 					.filter(ImageFilter.MaxFilter) \
 					.filter(ImageFilter.MinFilter) \
-					.convert("L")\
 					.convert("RGBA") \
 					;
 		self.width, self.height = self.image.size;
@@ -25,6 +27,12 @@ class Gravity(object):
 	def analyze(self):
 		self.supportLine = self.calcLine();
 		self.supportLine.sort();
+		#中央線を表示
+		self.debugImage = self.image.copy();
+		draw = ImageDraw.Draw(self.debugImage);
+		draw.line([tuple(pt[:2]) for pt in self.supportLine], fill="#ff0000", width=3);
+		del draw;
+		#回転角度を求める
 		rot = 0.0;
 		startPt = self.supportLine[0];
 		for pt in self.supportLine[1:]:
@@ -34,17 +42,12 @@ class Gravity(object):
 		rot /= len(self.supportLine)-1;
 		self.image = self.image.rotate(math.degrees(rot), Image.BICUBIC)
 		self.image = Image.composite(self.image, Image.new("RGBA", self.image.size, (255,255,255,255)), self.image)
+
 		#ポイントもそれにつれて回転
 		center = [self.width/2.0, self.height/2.0];
 		for i in xrange(0,len(self.supportLine)):
-			self.supportLine[i] = [int(val) for val in self.rotatePoint(center, self.supportLine[i], -rot)];
-
-		#中央線を表示
-		self.debugImage = self.image.copy();
-		draw = ImageDraw.Draw(self.debugImage);
-		draw.line([tuple(pt[:2]) for pt in self.supportLine], fill="#ff0000", width=3);
-		del draw;
-	def rotatePoint(self, centerPt, pt, rotate):
+			self.supportLine[i] = [int(val) for val in self.__rotatePoint(center, self.supportLine[i], -rot)];
+	def __rotatePoint(self, centerPt, pt, rotate):
 		sin_ = math.sin(rotate);
 		cos_ = math.cos(rotate);
 		return [
@@ -116,3 +119,6 @@ class Gravity(object):
 		return self.image;
 	def getDebugImage(self):
 		return self.debugImage;
+
+class BinarySearch(object):
+	pass

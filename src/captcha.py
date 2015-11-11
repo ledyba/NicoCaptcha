@@ -8,7 +8,7 @@ Created on 2011/12/11
 
 from PIL import Image, ImageTk;
 
-from analyzer.gravity import Gravity;
+from analyzer.grad import Gravity;
 from analyzer.box import BoxDetect;
 from analyzer.char import CharDetect;
 from analyzer.neural import NeuralNet, IN_SIZE_SQUARE;
