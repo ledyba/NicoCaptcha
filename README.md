@@ -21,4 +21,4 @@
 
 前処理をしてニューラルネットに放り込んだ結果がこうなります：
 
-![](https://raw.githubusercontent.com/ledyba/NicoCaptcha/master/image1.jpg)
+![](https://raw.githubusercontent.com/ledyba/NicoCaptcha/master/image1.png)
